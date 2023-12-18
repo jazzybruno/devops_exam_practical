@@ -2,6 +2,7 @@ package com.example.devopsexampractical.v1.controllers;
 
 import com.example.devopsexampractical.v1.dtos.requests.DoMathRequest;
 import com.example.devopsexampractical.v1.dtos.responses.CalcResponse;
+import com.example.devopsexampractical.v1.exceptions.InvalidOperationException;
 import com.example.devopsexampractical.v1.services.MathOperator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-@AutoConfigureMockMvc class MathsControllerIntegrationTest {
+@AutoConfigureMockMvc
+class MathsControllerIntegrationTest {
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
@@ -131,5 +133,25 @@ import static org.mockito.Mockito.when;
                 );
     }
 
+    // Test with invalid dividing by zero
+    @Test
+    public void testDivideWithZero() throws Exception {
+        DoMathRequest doMathRequest = new DoMathRequest(5 , 0 , "/");
+        Exception exception = new InvalidOperationException("Cannot divide by 0");
+        when(mathOperator.doMath(doMathRequest.getOperand1() , doMathRequest.getOperand2() , doMathRequest.getOperation())).thenThrow(exception);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/api/calc/do-maths")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(doMathRequest));
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(
+                        result -> {
+                            assert result.getResponse().getStatus() == 400;
+                        }
+                );
+    }
 
 }
