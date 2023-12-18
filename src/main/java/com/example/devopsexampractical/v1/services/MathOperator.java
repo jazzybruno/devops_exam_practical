@@ -1,5 +1,8 @@
 package com.example.devopsexampractical.v1.services;
 
-public interface MathOperator {
+import com.example.devopsexampractical.v1.exceptions.InvalidOperationException;
 
+public interface MathOperator {
+    double doMath(double operand1, double operand2, String operation) throws InvalidOperationException;
 }
+
