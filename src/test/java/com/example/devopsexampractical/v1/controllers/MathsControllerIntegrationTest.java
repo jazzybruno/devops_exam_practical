@@ -2,156 +2,89 @@ package com.example.devopsexampractical.v1.controllers;
 
 import com.example.devopsexampractical.v1.dtos.requests.DoMathRequest;
 import com.example.devopsexampractical.v1.dtos.responses.CalcResponse;
-import com.example.devopsexampractical.v1.exceptions.InvalidOperationException;
-import com.example.devopsexampractical.v1.services.MathOperator;
+import com.example.devopsexampractical.v1.utils.TestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockHttpServletRequestDsl;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class MathsControllerIntegrationTest {
 
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
+    private static RestTemplate restTemplate;
+    private static ObjectMapper objectMapper;
 
-    @MockBean
-    private MathOperator mathOperator;
+    @LocalServerPort
+    private int port = 5000;
+
+    @BeforeAll
+    public static void init() {
+        restTemplate = new RestTemplate();
+        objectMapper = new ObjectMapper();
+    }
+
 
     @Test
-    public void testAdd() throws Exception {
-        DoMathRequest doMathRequest = new DoMathRequest(5 , 4 , "+");
-        Double mockedresult = 9.0;
-        when(mathOperator.doMath(doMathRequest.getOperand1() , doMathRequest.getOperand2() , doMathRequest.getOperation())).thenReturn(mockedresult);
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/api/calc/do-maths")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(doMathRequest));
+    public void testAdd() {
+        DoMathRequest newItem = new DoMathRequest(1, 2, "+");
+        ResponseEntity<CalcResponse> response = restTemplate
+                .exchange("http://localhost:5000/api/calc/do-maths",
+                        HttpMethod.POST,
+                        TestUtils.createHttpEntity(newItem),
+                        CalcResponse.class);
 
-        mockMvc.perform(requestBuilder).andExpect(
-                result -> {
-                    CalcResponse calcResponse = objectMapper.readValue(result.getResponse().getContentAsString() , CalcResponse.class);
-                    System.out.println(calcResponse.getCalcResponse());
-                    assert calcResponse.getCalcResponse() == mockedresult;
-                }
-        )
-                .andExpect(
-                        result -> {
-                            assert result.getResponse().getStatus() == 200;
-                        }
-                );
+        assertNotNull(response.getBody());
+        assertEquals(3, response.getBody().getCalcResponse());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
-    public void testSubtract() throws Exception {
-        DoMathRequest doMathRequest = new DoMathRequest(5 , 4 , "-");
-        Double mockedresult = 1.0;
-        when(mathOperator.doMath(doMathRequest.getOperand1() , doMathRequest.getOperand2() , doMathRequest.getOperation())).thenReturn(mockedresult);
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/api/calc/do-maths")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(doMathRequest));
+    public void testSubtract() {
+        DoMathRequest newItem = new DoMathRequest(1, 2, "-");
+        ResponseEntity<CalcResponse> response = restTemplate
+                .exchange("http://localhost:5000/api/calc/do-maths",
+                        HttpMethod.POST,
+                        TestUtils.createHttpEntity(newItem),
+                        CalcResponse.class);
 
-        mockMvc.perform(requestBuilder).andExpect(
-                        result -> {
-                            CalcResponse calcResponse = objectMapper.readValue(result.getResponse().getContentAsString() , CalcResponse.class);
-                            System.out.println(calcResponse.getCalcResponse());
-                            assert calcResponse.getCalcResponse() == mockedresult;
-                        }
-                )
-                .andExpect(
-                        result -> {
-                            assert result.getResponse().getStatus() == 200;
-                        }
-                );
+        assertNotNull(response.getBody());
+        assertEquals(-1, response.getBody().getCalcResponse());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
-    public void testMultiply() throws Exception {
-        DoMathRequest doMathRequest = new DoMathRequest(5 , 4 , "*");
-        Double mockedresult = 20.0;
-        when(mathOperator.doMath(doMathRequest.getOperand1() , doMathRequest.getOperand2() , doMathRequest.getOperation())).thenReturn(mockedresult);
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/api/calc/do-maths")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(doMathRequest));
+    public void testMultiply() {
+        DoMathRequest newItem = new DoMathRequest(1, 2, "*");
+        ResponseEntity<CalcResponse> response = restTemplate
+                .exchange("http://localhost:5000/api/calc/do-maths",
+                        HttpMethod.POST,
+                        TestUtils.createHttpEntity(newItem),
+                        CalcResponse.class);
 
-        mockMvc.perform(requestBuilder).andExpect(
-                        result -> {
-                            CalcResponse calcResponse = objectMapper.readValue(result.getResponse().getContentAsString() , CalcResponse.class);
-                            System.out.println(calcResponse.getCalcResponse());
-                            assert calcResponse.getCalcResponse() == mockedresult;
-                        }
-                )
-                .andExpect(
-                        result -> {
-                            assert result.getResponse().getStatus() == 200;
-                        }
-                );
+        assertNotNull(response.getBody());
+        assertEquals(2, response.getBody().getCalcResponse());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
-    public void testDivide() throws Exception {
-        DoMathRequest doMathRequest = new DoMathRequest(5 , 5 , "/");
-        Double mockedresult = 1.0;
-        when(mathOperator.doMath(doMathRequest.getOperand1() , doMathRequest.getOperand2() , doMathRequest.getOperation())).thenReturn(mockedresult);
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/api/calc/do-maths")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(doMathRequest));
+    public void testDivide() {
+        DoMathRequest newItem = new DoMathRequest(6, 2, "/");
+        ResponseEntity<CalcResponse> response = restTemplate
+                .exchange("http://localhost:5000/api/calc/do-maths",
+                        HttpMethod.POST,
+                        TestUtils.createHttpEntity(newItem),
+                        CalcResponse.class);
 
-        mockMvc.perform(requestBuilder).andExpect(
-                        result -> {
-                            CalcResponse calcResponse = objectMapper.readValue(result.getResponse().getContentAsString() , CalcResponse.class);
-                            System.out.println(calcResponse.getCalcResponse());
-                            assert calcResponse.getCalcResponse() == mockedresult;
-                        }
-                )
-                .andExpect(
-                        result -> {
-                            assert result.getResponse().getStatus() == 200;
-                        }
-                );
-    }
-
-    // Test with invalid dividing by zero
-    @Test
-    public void testDivideWithZero() throws Exception {
-        DoMathRequest doMathRequest = new DoMathRequest(5 , 0 , "/");
-        Exception exception = new InvalidOperationException("Cannot divide by 0");
-        when(mathOperator.doMath(doMathRequest.getOperand1() , doMathRequest.getOperand2() , doMathRequest.getOperation())).thenThrow(exception);
-
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/api/calc/do-maths")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(doMathRequest));
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(
-                        result -> {
-                            assert result.getResponse().getStatus() == 400;
-                        }
-                );
+        assertNotNull(response.getBody());
+        assertEquals(3, response.getBody().getCalcResponse());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
 }

@@ -30,7 +30,7 @@ public class MathsController {
             CalcResponse calcResponse = new CalcResponse(result);
             return ResponseEntity.ok(calcResponse);
         } catch (InvalidOperationException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new CalcResponse());
         }
     }
 }
