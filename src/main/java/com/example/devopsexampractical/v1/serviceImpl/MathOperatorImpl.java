@@ -2,7 +2,9 @@ package com.example.devopsexampractical.v1.serviceImpl;
 
 import com.example.devopsexampractical.v1.exceptions.InvalidOperationException;
 import com.example.devopsexampractical.v1.services.MathOperator;
+import org.springframework.stereotype.Service;
 
+@Service
 public class MathOperatorImpl implements MathOperator {
     @Override
     public double doMath(double operand1, double operand2, String
