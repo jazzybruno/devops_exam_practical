@@ -79,4 +79,31 @@ class MathOperatorImplTest {
         result = mathOperator.doMath(operand1, operand2, operation);
         assertEquals(20, result);
     }
+
+    @Test
+    public void doMathsMultiplyByZero() throws InvalidOperationException {
+        operand1 = 20;
+        operand2 = 0;
+        operation = "*";
+        result = mathOperator.doMath(operand1, operand2, operation);
+        assertEquals(0, result);
+    }
+
+    @Test
+    public void doMathsAdditionWithNegative() throws InvalidOperationException {
+        operand1 = -20;
+        operand2 = 10;
+        operation = "+";
+        result = mathOperator.doMath(operand1, operand2, operation);
+        assertEquals(-10, result);
+    }
+
+    @Test
+    public void doMathsSubtractionWithNegative() throws InvalidOperationException {
+        operand1 = -20;
+        operand2 = 10;
+        operation = "-";
+        result = mathOperator.doMath(operand1, operand2, operation);
+        assertEquals(-30, result);
+    }
 }
